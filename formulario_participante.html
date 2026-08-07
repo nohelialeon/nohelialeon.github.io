@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Formulario de Prueba A/B — HCI</title>
+<style>
+  :root{
+    --bg:#131f24; --surface:#202f36; --surface-2:#2a3b43; --border:rgba(255,255,255,.1);
+    --green:#58cc02; --green-dark:#4caf00; --blue:#1cb0f6; --orange:#ff9600; --red:#ff4b4b;
+    --text:#f1f7fb; --text-dim:#8195a0; --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); margin:0; padding:0;
+    font-family:"Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:28px 20px 80px;}
+  h1{font-size:24px; margin-bottom:4px;}
+  .subtitle{color:var(--text-dim); font-size:14px; margin-bottom:24px;}
+  section{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:20px 22px; margin-bottom:20px;
+  }
+  section h2{font-size:16px; margin-bottom:14px; color:var(--green);}
+  label.field{display:block; margin-bottom:14px; font-size:13px; font-weight:700;}
+  input[type=text], input[type=email], input[type=number], select, textarea{
+    width:100%; margin-top:6px; padding:10px 12px; border-radius:8px;
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    font-size:14px; font-family:inherit;
+  }
+  textarea{min-height:60px; resize:vertical;}
+  .radio-row{display:flex; gap:14px; margin-top:6px; flex-wrap:wrap;}
+  .radio-row label{display:flex; align-items:center; gap:5px; font-weight:500; font-size:13px;}
+  table.likert{width:100%; border-collapse:collapse; margin-top:6px; font-size:12px;}
+  table.likert th{color:var(--text-dim); font-weight:700; padding:6px 4px; text-align:center;}
+  table.likert th:first-child{text-align:left;}
+  table.likert td{padding:8px 4px; text-align:center; border-top:1px solid var(--border);}
+  table.likert td:first-child{text-align:left; font-weight:600; font-size:13px;}
+  .save-btn{
+    background:var(--green); color:#fff; border:none; font-weight:800; font-size:15px;
+    padding:14px; width:100%; border-radius:12px; cursor:pointer; margin-top:6px;
+    box-shadow:0 4px 0 var(--green-dark);
+  }
+  .save-btn:active{transform:translateY(2px); box-shadow:0 2px 0 var(--green-dark);}
+  .save-btn:disabled{background:var(--surface-2); color:var(--text-dim); box-shadow:none; cursor:not-allowed;}
+  .error-box{
+    background:rgba(255,75,75,.12); border:1px solid var(--red); color:var(--red);
+    border-radius:10px; padding:12px 16px; font-size:13px; margin-top:12px; display:none;
+  }
+  .error-box.show{display:block;}
+  .error-box button{
+    margin-top:8px; background:var(--red); color:#fff; border:none; font-weight:800;
+    padding:8px 14px; border-radius:8px; cursor:pointer; font-size:13px;
+  }
+  .thanks{
+    text-align:center; padding:60px 20px;
+  }
+  .thanks .big{font-size:52px; margin-bottom:14px;}
+  .thanks h2{font-size:22px; margin-bottom:8px;}
+  .thanks p{color:var(--text-dim); font-size:14px;}
+  #formSection{display:block;}
+  #thanksSection{display:none;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>Formulario de Prueba A/B</h1>
+  <div class="subtitle">Rediseño de la pantalla principal — Proyecto Final HCI</div>
+
+  <div id="formSection">
+    <form id="form">
+      <section>
+        <h2>1. Datos del participante</h2>
+        <label class="field">Nombre completo
+          <input type="text" id="p_nombre" required>
+        </label>
+        <label class="field">Correo institucional
+          <input type="email" id="p_correo" required placeholder="nombre@utm.edu.ec">
+        </label>
+        <label class="field">Edad
+          <input type="number" id="p_edad" min="1" max="120">
+        </label>
+        <label class="field">¿Usa o ha usado apps de aprendizaje de idiomas?
+          <div class="radio-row">
+            <label><input type="radio" name="p_usa" value="Sí"> Sí</label>
+            <label><input type="radio" name="p_usa" value="No"> No</label>
+          </div>
+        </label>
+        <label class="field">Frecuencia de uso
+          <select id="p_frecuencia">
+            <option value="">—</option>
+            <option>Diario</option>
+            <option>Semanal</option>
+            <option>Ocasional</option>
+            <option>Nunca</option>
+          </select>
+        </label>
+      </section>
+
+      <section>
+        <h2>2. Evaluación — Versión A</h2>
+        <label class="field">Tiempo en completar la tarea (segundos)
+          <input type="number" id="a_tiempo" min="0">
+        </label>
+        <table class="likert" id="tabla_a"></table>
+        <label class="field">Comentarios sobre la Versión A
+          <textarea id="a_comentarios"></textarea>
+        </label>
+      </section>
+
+      <section>
+        <h2>3. Evaluación — Versión B</h2>
+        <label class="field">Tiempo en completar la tarea (segundos)
+          <input type="number" id="b_tiempo" min="0">
+        </label>
+        <table class="likert" id="tabla_b"></table>
+        <label class="field">Comentarios sobre la Versión B
+          <textarea id="b_comentarios"></textarea>
+        </label>
+      </section>
+
+      <section>
+        <h2>4. Comparación directa</h2>
+        <label class="field">¿Cuál versión prefiere?
+          <div class="radio-row">
+            <label><input type="radio" name="pref" value="A"> Versión A</label>
+            <label><input type="radio" name="pref" value="B"> Versión B</label>
+            <label><input type="radio" name="pref" value="Ninguna"> Ninguna en particular</label>
+          </div>
+        </label>
+        <label class="field">¿Por qué prefiere esa versión?
+          <textarea id="pref_razon"></textarea>
+        </label>
+        <label class="field">¿Qué cambiaría o mejoraría?
+          <textarea id="pref_mejora"></textarea>
+        </label>
+      </section>
+
+      <section>
+        <h2>5. Comentarios finales</h2>
+        <label class="field">
+          <textarea id="final_comentarios"></textarea>
+        </label>
+      </section>
+
+      <button type="submit" class="save-btn" id="btnSubmit">Enviar respuestas</button>
+      <div class="error-box" id="errorBox">
+        No se pudo enviar tu respuesta. Revisa tu conexión a internet e inténtalo de nuevo.
+        <br><button type="button" onclick="reintentarEnvio()">Reintentar envío</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="thanksSection" class="thanks">
+    <div class="big">🎉</div>
+    <h2>¡Gracias por participar!</h2>
+    <p>Tu respuesta fue registrada correctamente.</p>
+  </div>
+</div>
+
+<script>
+  const preguntas = [
+    "La pantalla fue fácil de entender a primera vista",
+    "Encontré rápidamente el botón para iniciar la lección",
+    "La información (racha, monedas, corazones) es clara y visible",
+    "El diseño se ve atractivo y ordenado",
+    "Me sentí satisfecho/a usando esta versión"
+  ];
+
+  function buildLikertTable(tableId, prefix){
+    const table = document.getElementById(tableId);
+    let html = "<tr><th>Afirmación</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>";
+    preguntas.forEach((preg, i) => {
+      html += `<tr><td>${preg}</td>`;
+      for(let v=1; v<=5; v++){
+        html += `<td><input type="radio" name="${prefix}_q${i}" value="${v}" required></td>`;
+      }
+      html += "</tr>";
+    });
+    table.innerHTML = html;
+  }
+  buildLikertTable("tabla_a", "a");
+  buildLikertTable("tabla_b", "b");
+
+  // ⚠️ Pega aquí la misma URL de tu implementación de Apps Script
+  const SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzgS-x1pw1loyJlJSWlLwHSETN8l3spW81xZ51ZUjERmxTKne24T8jmEL60PuO2VZi7lA/exec";
+
+  function val(id){ return document.getElementById(id).value; }
+  function radioVal(name){
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : "";
+  }
+
+  let ultimoRow = null; // se guarda por si hay que reintentar
+
+  document.getElementById("form").addEventListener("submit", async function(e){
+    e.preventDefault();
+
+    const row = {
+      "Participante": val("p_nombre"),
+      "Correo institucional": val("p_correo"),
+      "Edad": val("p_edad"),
+      "Usa apps de idiomas": radioVal("p_usa"),
+      "Frecuencia de uso": val("p_frecuencia"),
+      "A - Tiempo (s)": val("a_tiempo"),
+    };
+    preguntas.forEach((preg, i) => row[`A - ${preg}`] = radioVal(`a_q${i}`));
+    row["A - Comentarios"] = val("a_comentarios");
+
+    row["B - Tiempo (s)"] = val("b_tiempo");
+    preguntas.forEach((preg, i) => row[`B - ${preg}`] = radioVal(`b_q${i}`));
+    row["B - Comentarios"] = val("b_comentarios");
+
+    row["Versión preferida"] = radioVal("pref");
+    row["Por qué prefiere"] = val("pref_razon");
+    row["Qué mejoraría"] = val("pref_mejora");
+    row["Comentarios finales"] = val("final_comentarios");
+    row["Fecha/hora"] = new Date().toLocaleString();
+
+    ultimoRow = row;
+    await enviarYMostrarResultado(row);
+  });
+
+  async function enviarYMostrarResultado(row){
+    const btn = document.getElementById("btnSubmit");
+    const errorBox = document.getElementById("errorBox");
+    btn.disabled = true;
+    btn.textContent = "Enviando...";
+    errorBox.classList.remove("show");
+
+    const ok = await enviarAGoogleSheets(row);
+
+    if(ok){
+      document.getElementById("formSection").style.display = "none";
+      document.getElementById("thanksSection").style.display = "block";
+      window.scrollTo({top:0, behavior:"smooth"});
+    }else{
+      btn.disabled = false;
+      btn.textContent = "Enviar respuestas";
+      errorBox.classList.add("show");
+    }
+  }
+
+  function reintentarEnvio(){
+    if(ultimoRow) enviarYMostrarResultado(ultimoRow);
+  }
+
+  async function enviarAGoogleSheets(row){
+    try{
+      const res = await fetch(SHEET_WEBAPP_URL, {
+        method: "POST",
+        headers: {"Content-Type": "text/plain;charset=utf-8"},
+        body: JSON.stringify(row)
+      });
+      const data = await res.json();
+      return data.status === "ok";
+    }catch(err){
+      console.error("Error enviando a Google Sheets:", err);
+      return false;
+    }
+  }
+</script>
+
+</body>
+</html>
