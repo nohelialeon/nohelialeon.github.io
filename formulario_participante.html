@@ -71,7 +71,7 @@
 
   <div id="formSection">
     <form id="form">
-      <section>
+      <section id="sec-datos">
         <h2>1. Datos del participante</h2>
         <label class="field">Nombre completo
           <input type="text" id="p_nombre" required>
@@ -99,7 +99,7 @@
         </label>
       </section>
 
-      <section>
+      <section id="sec-a">
         <h2>2. Evaluación — Versión A</h2>
         <label class="field">Tiempo en completar la tarea (segundos)
           <input type="number" id="a_tiempo" min="0">
@@ -110,7 +110,7 @@
         </label>
       </section>
 
-      <section>
+      <section id="sec-b">
         <h2>3. Evaluación — Versión B</h2>
         <label class="field">Tiempo en completar la tarea (segundos)
           <input type="number" id="b_tiempo" min="0">
@@ -121,7 +121,7 @@
         </label>
       </section>
 
-      <section>
+      <section id="sec-comparacion">
         <h2>4. Comparación directa</h2>
         <label class="field">¿Cuál versión prefiere?
           <div class="radio-row">
@@ -138,7 +138,7 @@
         </label>
       </section>
 
-      <section>
+      <section id="sec-final">
         <h2>5. Comentarios finales</h2>
         <label class="field">
           <textarea id="final_comentarios"></textarea>
@@ -161,13 +161,30 @@
 </div>
 
 <script>
+  // System Usability Scale (SUS) — Brooke, 1986. Adaptado a "esta aplicación".
+  // Los índices pares (0,2,4,6,8) son afirmaciones positivas; los impares (1,3,5,7,9) son negativas.
   const preguntas = [
-    "La pantalla fue fácil de entender a primera vista",
-    "Encontré rápidamente el botón para iniciar la lección",
-    "La información (racha, monedas, corazones) es clara y visible",
-    "El diseño se ve atractivo y ordenado",
-    "Me sentí satisfecho/a usando esta versión"
+    "Creo que me gustaría usar esta aplicación con frecuencia",
+    "Encontré la aplicación innecesariamente compleja",
+    "Pensé que la aplicación era fácil de usar",
+    "Creo que necesitaría el apoyo de una persona técnica para poder usar esta aplicación",
+    "Encontré que las funciones de esta aplicación estaban bien integradas",
+    "Pensé que había demasiada inconsistencia en esta aplicación",
+    "Me imagino que la mayoría de las personas aprendería a usar esta aplicación muy rápidamente",
+    "Encontré la aplicación muy incómoda de usar",
+    "Me sentí muy seguro/a usando la aplicación",
+    "Necesité aprender muchas cosas antes de poder empezar a usar esta aplicación"
   ];
+
+  function calcularSUS(prefix){
+    let total = 0;
+    for(let i = 0; i < preguntas.length; i++){
+      const v = parseInt(radioVal(`${prefix}_q${i}`), 10);
+      if(isNaN(v)) return ""; // no completado, no se calcula
+      total += (i % 2 === 0) ? (v - 1) : (5 - v);
+    }
+    return total * 2.5; // escala 0-100
+  }
 
   function buildLikertTable(tableId, prefix){
     const table = document.getElementById(tableId);
@@ -184,6 +201,33 @@
   buildLikertTable("tabla_a", "a");
   buildLikertTable("tabla_b", "b");
 
+  // ---- Adaptar el formulario según el grupo (A o B) ----
+  function getQueryParam(name){
+    const match = window.location.search.match(new RegExp("[?&]" + name + "=([^&]*)"));
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+  const grupo = getQueryParam("grupo"); // "a", "b", o null (formulario completo, ambas versiones)
+
+  if(grupo === "a"){
+    document.getElementById("sec-b").style.display = "none";
+    document.getElementById("sec-comparacion").style.display = "none";
+    document.getElementById("sec-a").querySelector("h2").textContent = "2. Evaluación de la pantalla";
+    document.querySelector(".subtitle").textContent = "Grupo A — Versión oficial de Duolingo — Proyecto Final HCI";
+  }else if(grupo === "b"){
+    document.getElementById("sec-a").style.display = "none";
+    document.getElementById("sec-comparacion").style.display = "none";
+    document.getElementById("sec-b").querySelector("h2").textContent = "2. Evaluación de la pantalla";
+    document.querySelector(".subtitle").textContent = "Grupo B — Rediseño de la pantalla principal — Proyecto Final HCI";
+  }
+  // Si no hay parámetro de grupo, se muestra el formulario completo (compatibilidad con pruebas dentro-de-sujeto)
+
+  // Renumerar los encabezados visibles en orden (1, 2, 3...)
+  const visibles = Array.from(document.querySelectorAll("#form section")).filter(s => s.style.display !== "none");
+  visibles.forEach((s, i) => {
+    const h2 = s.querySelector("h2");
+    h2.textContent = h2.textContent.replace(/^\d+\./, (i + 1) + ".");
+  });
+
   // ⚠️ Pega aquí la misma URL de tu implementación de Apps Script
   const SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzgS-x1pw1loyJlJSWlLwHSETN8l3spW81xZ51ZUjERmxTKne24T8jmEL60PuO2VZi7lA/exec";
 
@@ -199,6 +243,7 @@
     e.preventDefault();
 
     const row = {
+      "Grupo": grupo ? grupo.toUpperCase() : "Ambos (dentro-sujeto)",
       "Participante": val("p_nombre"),
       "Correo institucional": val("p_correo"),
       "Edad": val("p_edad"),
@@ -208,10 +253,12 @@
     };
     preguntas.forEach((preg, i) => row[`A - ${preg}`] = radioVal(`a_q${i}`));
     row["A - Comentarios"] = val("a_comentarios");
+    row["A - Puntaje SUS (0-100)"] = calcularSUS("a");
 
     row["B - Tiempo (s)"] = val("b_tiempo");
     preguntas.forEach((preg, i) => row[`B - ${preg}`] = radioVal(`b_q${i}`));
     row["B - Comentarios"] = val("b_comentarios");
+    row["B - Puntaje SUS (0-100)"] = calcularSUS("b");
 
     row["Versión preferida"] = radioVal("pref");
     row["Por qué prefiere"] = val("pref_razon");
@@ -262,6 +309,9 @@
     }
   }
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
