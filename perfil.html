@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crea tu perfil — Duolingo (prototipo)</title>
+<style>
+:root{
+  --bg:#131f24; --surface:#202f36; --surface-2:#37464f; --border:rgba(255,255,255,.1);
+  --green:#58cc02; --green-dark:#4caf00; --blue:#1cb0f6; --orange:#ff9600; --red:#ff4b4b;
+  --purple:#ce82ff; --text:#f1f7fb; --text-dim:#8195a0; --radius:16px;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html, body{max-width:100%; overflow-x:hidden;}
+body{background:var(--bg); color:var(--text); font-family:"Segoe UI", system-ui, -apple-system, sans-serif; display:flex; min-height:100vh;}
+.sidebar{width:230px; padding:28px 16px; border-right:1px solid var(--border); flex-shrink:0;}
+.logo{color:var(--green); font-weight:800; font-size:26px; margin-bottom:32px; padding-left:8px; display:block; text-decoration:none;}
+.nav-item{display:flex; align-items:center; gap:14px; padding:12px 14px; border-radius:12px; color:var(--text-dim); font-weight:700; letter-spacing:.3px; font-size:14px; margin-bottom:6px; cursor:pointer; text-decoration:none;}
+.nav-item:hover{background:rgba(255,255,255,.05); color:var(--text);}
+.nav-item.active{background:rgba(28,176,246,.12); color:var(--blue); border:2px solid var(--blue); padding:10px 12px;}
+.nav-item .ic{font-size:20px;}
+main{flex:1; padding:28px 40px 60px; max-width:1000px;}
+.topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; flex-wrap:wrap; gap:12px;}
+.back-link{color:var(--text-dim); text-decoration:none; font-weight:700; font-size:13px; display:flex; align-items:center; gap:6px;}
+.back-link:hover{color:var(--text);}
+.mini-stats{display:flex; gap:16px; background:var(--surface); border:1px solid var(--border); padding:8px 16px; border-radius:999px; font-weight:800; font-size:14px;}
+.mini-stats span{display:flex; align-items:center; gap:5px;}
+h1.page-title{font-size:26px; margin-bottom:6px;}
+.page-sub{color:var(--text-dim); font-size:14px; margin-bottom:26px;}
+.card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px 22px; margin-bottom:18px;}
+.btn{background:var(--green); color:#fff; border:none; font-weight:800; font-size:15px; padding:14px 28px; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 var(--green-dark); text-decoration:none; display:inline-block;}
+.btn.blue{background:var(--blue); box-shadow:0 4px 0 #0d8fca;}
+.btn:disabled{background:var(--surface-2); color:var(--text-dim); box-shadow:none; cursor:not-allowed;}
+.survey-fab{position:fixed; bottom:24px; right:24px; z-index:100; background:var(--blue); color:#04202c; text-decoration:none; font-weight:800; font-size:14px; padding:14px 22px; border-radius:999px; box-shadow:0 6px 16px rgba(0,0,0,.35); display:flex; align-items:center; gap:8px;}
+@media (max-width:900px){
+  .sidebar{display:none;}
+  main{padding:20px; max-width:100%;}
+}
+</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <a href="prototipo_b.html" class="logo">duolingo</a>
+    <a href="prototipo_b.html" class="nav-item"><span class="ic">🏠</span> APRENDER</a>
+    <a href="sonidos.html" class="nav-item"><span class="ic">💬</span> SONIDOS</a>
+    <a href="ligas.html" class="nav-item"><span class="ic">🛡️</span> LIGAS</a>
+    <a href="desafios.html" class="nav-item"><span class="ic">🏆</span> DESAFÍOS</a>
+    <a href="tienda.html" class="nav-item"><span class="ic">🛍️</span> TIENDA</a>
+    <a href="perfil.html" class="nav-item active"><span class="ic">👤</span> PERFIL</a>
+    <a href="mas.html" class="nav-item"><span class="ic">⋯</span> MÁS</a>
+  </aside>
+  <main>
+    <div class="topbar">
+      <a href="prototipo_b.html" class="back-link">← Volver</a>
+      <div class="mini-stats">
+        <span>🔥 1</span><span>💎 505</span><span>❤️ 5</span>
+      </div>
+    </div>
+    <h1 class="page-title">Crea tu perfil</h1>
+    <div class="page-sub">Guarda tu progreso y compite con otros usuarios</div>
+    
+    <div class="card" style="text-align:center;">
+      <div style="font-size:44px; margin-bottom:10px;">👤</div>
+      <p style="color:var(--text-dim); margin-bottom:16px;">Aún no tienes un perfil creado en este prototipo.</p>
+      <a href="prototipo_b.html" class="btn">VOLVER A APRENDER</a>
+    </div>
+  
+  </main>
+  <a href="formulario_participante.html" class="survey-fab">Continuar a la encuesta →</a>
+</body>
+</html>

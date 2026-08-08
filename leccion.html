@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lección — Duolingo (prototipo)</title>
+<style>
+  :root{
+    --bg:#131f24; --surface:#202f36; --surface-2:#37464f; --border:rgba(255,255,255,.1);
+    --green:#58cc02; --green-dark:#4caf00; --blue:#1cb0f6; --orange:#ff9600; --red:#ff4b4b;
+    --text:#f1f7fb; --text-dim:#8195a0; --radius:16px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text); min-height:100vh;
+    font-family:"Segoe UI", system-ui, -apple-system, sans-serif;
+    display:flex; flex-direction:column;
+  }
+  .top{
+    display:flex; align-items:center; gap:20px; padding:20px 24px;
+  }
+  .close{color:var(--text-dim); font-size:22px; text-decoration:none; font-weight:700;}
+  .track{flex:1; background:var(--surface-2); border-radius:8px; height:14px; overflow:hidden;}
+  .track-fill{background:var(--green); height:100%; width:20%; border-radius:8px; transition:width .3s;}
+  .hearts{display:flex; align-items:center; gap:6px; font-weight:800; color:var(--red);}
+
+  .wrap{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; max-width:700px; margin:0 auto; width:100%;}
+  .tag{
+    display:flex; align-items:center; gap:8px; color:#c084fc; font-weight:800; font-size:13px; margin-bottom:14px;
+  }
+  .question{font-size:26px; font-weight:800; margin-bottom:36px; text-align:center;}
+  .options{display:flex; gap:18px; width:100%;}
+  .opt{
+    background:var(--surface); border:2px solid var(--border); border-radius:14px;
+    padding:24px 12px 16px; text-align:center; cursor:pointer; position:relative;
+    transition:border-color .15s, background .15s;
+    flex:1 1 0;
+  }
+  .opt:hover{border-color:var(--blue);}
+  .opt.selected{border-color:var(--blue); background:rgba(28,176,246,.1);}
+  .opt.correct{border-color:var(--green); background:rgba(88,204,2,.12);}
+  .opt.wrong{border-color:var(--red); background:rgba(255,75,75,.12);}
+  .opt .emoji{font-size:44px; margin-bottom:10px;}
+  .opt .word{font-weight:700; font-size:15px;}
+  .opt .num{
+    position:absolute; top:8px; left:8px; font-size:11px; color:var(--text-dim);
+    border:1px solid var(--border); border-radius:6px; width:20px; height:20px;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .bottom{
+    padding:20px 24px 32px; display:flex; justify-content:space-between; align-items:center;
+    border-top:1px solid var(--border);
+  }
+  .skip{background:none; border:none; color:var(--text-dim); font-weight:800; font-size:14px; cursor:pointer;}
+  .check{
+    background:var(--surface-2); color:var(--text-dim); border:none; font-weight:800; font-size:15px;
+    padding:14px 32px; border-radius:12px; cursor:not-allowed;
+  }
+  .check.ready{background:var(--green); color:#fff; cursor:pointer; box-shadow:0 4px 0 var(--green-dark);}
+  .check.ready.wrong-state{background:var(--red); box-shadow:0 4px 0 #b33333;}
+
+  .feedback{
+    display:none; padding:18px 24px; align-items:center; justify-content:space-between;
+  }
+  .feedback.show{display:flex;}
+  .feedback.correct{background:rgba(88,204,2,.15);}
+  .feedback.incorrect{background:rgba(255,75,75,.15);}
+  .feedback .msg{font-weight:800; font-size:16px;}
+  .feedback.correct .msg{color:var(--green);}
+  .feedback.incorrect .msg{color:var(--red);}
+  .continue-btn{
+    background:var(--green); color:#fff; border:none; font-weight:800; font-size:15px;
+    padding:14px 32px; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 var(--green-dark);
+  }
+  .feedback.incorrect .continue-btn{background:var(--red); box-shadow:0 4px 0 #b33333;}
+
+  .done-screen{display:none; flex:1; flex-direction:column; align-items:center; justify-content:center; padding:20px; text-align:center;}
+  .done-screen.show{display:flex;}
+  .done-screen .big{font-size:56px; margin-bottom:14px;}
+
+  @media (max-width:600px){
+    .options{flex-direction:column;}
+    .question{font-size:21px;}
+  }
+</style>
+</head>
+<body>
+
+  <div id="quizScreen">
+    <div class="top">
+      <a href="prototipo_b.html" class="close">✕</a>
+      <div class="track"><div class="track-fill" id="trackFill"></div></div>
+      <div class="hearts">❤️ <span id="heartsCount">5</span></div>
+    </div>
+
+    <div class="wrap">
+      <div class="tag">🔶 PALABRA NUEVA</div>
+      <div class="question">¿Cuál de estos es "leche"?</div>
+      <div class="options" id="options">
+        <div class="opt" data-correct="false" onclick="selectOption(this)">
+          <span class="num">1</span>
+          <div class="emoji">🧂</div>
+          <div class="word">sugar</div>
+        </div>
+        <div class="opt" data-correct="true" onclick="selectOption(this)">
+          <span class="num">2</span>
+          <div class="emoji">🥛</div>
+          <div class="word">milk</div>
+        </div>
+        <div class="opt" data-correct="false" onclick="selectOption(this)">
+          <span class="num">3</span>
+          <div class="emoji">☕</div>
+          <div class="word">coffee</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <button class="skip" onclick="siguientePregunta()">SALTAR</button>
+      <button class="check" id="checkBtn" onclick="comprobar()" disabled>COMPROBAR</button>
+    </div>
+
+    <div class="feedback" id="feedback">
+      <div class="msg" id="feedbackMsg">¡Correcto!</div>
+      <button class="continue-btn" onclick="siguientePregunta()">CONTINUAR</button>
+    </div>
+  </div>
+
+  <div class="done-screen" id="doneScreen">
+    <div class="big">🎉</div>
+    <h2 style="margin-bottom:10px;">¡Lección completada!</h2>
+    <p style="color:var(--text-dim); margin-bottom:24px;">Ganaste 10 EXP y mantuviste tu racha.</p>
+    <a href="prototipo_b.html" class="continue-btn" style="text-decoration:none;">VOLVER A APRENDER</a>
+  </div>
+
+<script>
+  let selected = null;
+  let progress = 20; // ya inicia en 20% para simular que es 1 de 5 preguntas
+
+  function selectOption(el){
+    document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    selected = el;
+    const btn = document.getElementById('checkBtn');
+    btn.disabled = false;
+    btn.classList.add('ready');
+  }
+
+  function comprobar(){
+    if(!selected) return;
+    const correct = selected.dataset.correct === "true";
+    const feedback = document.getElementById('feedback');
+    const msg = document.getElementById('feedbackMsg');
+    const btn = document.getElementById('checkBtn');
+
+    document.querySelectorAll('.opt').forEach(o => {
+      if(o.dataset.correct === "true") o.classList.add('correct');
+    });
+
+    if(correct){
+      feedback.className = 'feedback show correct';
+      msg.textContent = '¡Correcto! 🎉';
+    }else{
+      selected.classList.add('wrong');
+      feedback.className = 'feedback show incorrect';
+      msg.textContent = 'Respuesta incorrecta. La correcta es "milk".';
+      const hearts = document.getElementById('heartsCount');
+      hearts.textContent = Math.max(0, parseInt(hearts.textContent) - 1);
+    }
+    btn.style.display = 'none';
+  }
+
+  function siguientePregunta(){
+    progress += 20;
+    document.getElementById('trackFill').style.width = Math.min(progress, 100) + '%';
+
+    if(progress >= 100){
+      document.getElementById('quizScreen').style.display = 'none';
+      document.getElementById('doneScreen').classList.add('show');
+    }else{
+      // en este prototipo, reinicia la misma pregunta de ejemplo para mostrar el flujo
+      document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected','correct','wrong'));
+      document.getElementById('feedback').className = 'feedback';
+      const btn = document.getElementById('checkBtn');
+      btn.style.display = 'block';
+      btn.disabled = true;
+      btn.classList.remove('ready');
+      selected = null;
+    }
+  }
+</script>
+
+</body>
+</html>
