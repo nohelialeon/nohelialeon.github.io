@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grupo A — Duolingo oficial</title>
+<style>
+  :root{
+    --bg:#131f24; --surface:#202f36; --border:rgba(255,255,255,.1);
+    --green:#58cc02; --green-dark:#4caf00; --blue:#1cb0f6; --blue-dark:#0d8fca;
+    --text:#f1f7fb; --text-dim:#8195a0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); margin:0; min-height:100vh;
+    font-family:"Segoe UI", system-ui, -apple-system, sans-serif;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .wrap{max-width:560px; text-align:center;}
+  .badge{
+    display:inline-block; background:rgba(28,176,246,.15); color:var(--blue);
+    font-weight:800; font-size:13px; padding:6px 14px; border-radius:999px; margin-bottom:18px;
+  }
+  h1{font-size:22px; margin-bottom:14px;}
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 24px; margin-bottom:20px; text-align:left;}
+  .card ol{color:var(--text-dim); font-size:14px; line-height:1.9; padding-left:20px;}
+  .card ol b{color:var(--text);}
+  .btn{
+    display:inline-block; border:none; font-weight:800; font-size:15px;
+    padding:16px 30px; border-radius:12px; cursor:pointer; text-decoration:none; width:100%;
+  }
+  .btn.official{background:var(--blue); color:#04202c; box-shadow:0 4px 0 var(--blue-dark); margin-bottom:14px;}
+  .btn.continue{background:var(--green); color:#fff; box-shadow:0 4px 0 var(--green-dark);}
+  .btn.continue.disabled{background:#37464f; color:var(--text-dim); box-shadow:none; cursor:not-allowed; pointer-events:none;}
+  .hint{font-size:12px; color:var(--text-dim); margin-top:10px;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <span class="badge">GRUPO A</span>
+  <h1>Vas a probar la versión oficial de Duolingo</h1>
+
+  <div class="card">
+    <ol>
+      <li>Haz clic en <b>"Abrir Duolingo oficial"</b> — se abrirá en una pestaña nueva (esta pestaña se queda abierta).</li>
+      <li>Explora la <b>pantalla principal</b>: ubica tu racha, tus gemas, tus vidas, y encuentra cómo empezar una lección.</li>
+      <li>Cuando termines, <b>vuelve a esta pestaña</b> y haz clic en "Continuar a la encuesta".</li>
+    </ol>
+  </div>
+
+  <a href="https://www.duolingo.com/learn" target="_blank" rel="noopener" class="btn official" onclick="habilitarContinuar()">Abrir Duolingo oficial ↗</a>
+
+  <a href="formulario_participante.html?grupo=a" class="btn continue disabled" id="btnContinuar">Continuar a la encuesta →</a>
+  <div class="hint" id="hint">El botón de arriba se activa después de que abras Duolingo.</div>
+</div>
+
+<script>
+  function habilitarContinuar(){
+    const btn = document.getElementById('btnContinuar');
+    btn.classList.remove('disabled');
+    document.getElementById('hint').textContent = "¡Listo! Cuando termines de explorar, haz clic para continuar.";
+  }
+</script>
+
+</body>
+</html>
