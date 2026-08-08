@@ -95,25 +95,9 @@
     </div>
 
     <div class="wrap">
-      <div class="tag">🔶 PALABRA NUEVA</div>
-      <div class="question">¿Cuál de estos es "leche"?</div>
-      <div class="options" id="options">
-        <div class="opt" data-correct="false" onclick="selectOption(this)">
-          <span class="num">1</span>
-          <div class="emoji">🧂</div>
-          <div class="word">sugar</div>
-        </div>
-        <div class="opt" data-correct="true" onclick="selectOption(this)">
-          <span class="num">2</span>
-          <div class="emoji">🥛</div>
-          <div class="word">milk</div>
-        </div>
-        <div class="opt" data-correct="false" onclick="selectOption(this)">
-          <span class="num">3</span>
-          <div class="emoji">☕</div>
-          <div class="word">coffee</div>
-        </div>
-      </div>
+      <div class="tag" id="tag"></div>
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
     </div>
 
     <div class="bottom">
@@ -135,8 +119,72 @@
   </div>
 
 <script>
+  const preguntas = [
+    {
+      tag: "🔶 PALABRA NUEVA",
+      texto: '¿Cuál de estos es "leche"?',
+      opciones: [
+        { emoji: "🧂", label: "sugar", correcta: false },
+        { emoji: "🥛", label: "milk", correcta: true },
+        { emoji: "☕", label: "coffee", correcta: false },
+      ],
+    },
+    {
+      tag: "🔶 PALABRA NUEVA",
+      texto: '¿Cuál de estos es "té"?',
+      opciones: [
+        { emoji: "🍵", label: "tea", correcta: true },
+        { emoji: "💧", label: "water", correcta: false },
+        { emoji: "🧃", label: "juice", correcta: false },
+      ],
+    },
+    {
+      tag: "📘 COMPLETA LA FRASE",
+      texto: '¿Cómo se dice "agua" en inglés?',
+      opciones: [
+        { emoji: "💧", label: "water", correcta: true },
+        { emoji: "🍷", label: "wine", correcta: false },
+        { emoji: "🥤", label: "soda", correcta: false },
+      ],
+    },
+    {
+      tag: "🔄 TRADUCCIÓN",
+      texto: '¿Qué significa "please"?',
+      opciones: [
+        { emoji: "🙏", label: "por favor", correcta: true },
+        { emoji: "🙌", label: "gracias", correcta: false },
+        { emoji: "😅", label: "perdón", correcta: false },
+      ],
+    },
+    {
+      tag: "🔄 TRADUCCIÓN",
+      texto: 'Selecciona la traducción de "coffee with milk"',
+      opciones: [
+        { emoji: "☕", label: "café con leche", correcta: true },
+        { emoji: "🍵", label: "té con azúcar", correcta: false },
+        { emoji: "🧊", label: "agua con hielo", correcta: false },
+      ],
+    },
+  ];
+
+  let indice = 0;
   let selected = null;
-  let progress = 20; // ya inicia en 20% para simular que es 1 de 5 preguntas
+  const paso = 100 / preguntas.length;
+  let progress = paso;
+
+  function renderPregunta(){
+    const p = preguntas[indice];
+    document.getElementById('tag').textContent = p.tag;
+    document.getElementById('question').textContent = p.texto;
+    document.getElementById('options').innerHTML = p.opciones.map((o, i) => `
+      <div class="opt" data-correct="${o.correcta}" onclick="selectOption(this)">
+        <span class="num">${i + 1}</span>
+        <div class="emoji">${o.emoji}</div>
+        <div class="word">${o.label}</div>
+      </div>
+    `).join('');
+    document.getElementById('trackFill').style.width = progress + '%';
+  }
 
   function selectOption(el){
     document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
@@ -153,6 +201,7 @@
     const feedback = document.getElementById('feedback');
     const msg = document.getElementById('feedbackMsg');
     const btn = document.getElementById('checkBtn');
+    const respuestaCorrecta = preguntas[indice].opciones.find(o => o.correcta).label;
 
     document.querySelectorAll('.opt').forEach(o => {
       if(o.dataset.correct === "true") o.classList.add('correct');
@@ -164,7 +213,7 @@
     }else{
       selected.classList.add('wrong');
       feedback.className = 'feedback show incorrect';
-      msg.textContent = 'Respuesta incorrecta. La correcta es "milk".';
+      msg.textContent = `Respuesta incorrecta. La correcta es "${respuestaCorrecta}".`;
       const hearts = document.getElementById('heartsCount');
       hearts.textContent = Math.max(0, parseInt(hearts.textContent) - 1);
     }
@@ -172,23 +221,26 @@
   }
 
   function siguientePregunta(){
-    progress += 20;
-    document.getElementById('trackFill').style.width = Math.min(progress, 100) + '%';
+    indice++;
 
-    if(progress >= 100){
+    if(indice >= preguntas.length){
+      document.getElementById('trackFill').style.width = '100%';
       document.getElementById('quizScreen').style.display = 'none';
       document.getElementById('doneScreen').classList.add('show');
-    }else{
-      // en este prototipo, reinicia la misma pregunta de ejemplo para mostrar el flujo
-      document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected','correct','wrong'));
-      document.getElementById('feedback').className = 'feedback';
-      const btn = document.getElementById('checkBtn');
-      btn.style.display = 'block';
-      btn.disabled = true;
-      btn.classList.remove('ready');
-      selected = null;
+      return;
     }
+
+    progress += paso;
+    document.getElementById('feedback').className = 'feedback';
+    const btn = document.getElementById('checkBtn');
+    btn.style.display = 'block';
+    btn.disabled = true;
+    btn.classList.remove('ready');
+    selected = null;
+    renderPregunta();
   }
+
+  renderPregunta();
 </script>
 
 </body>
