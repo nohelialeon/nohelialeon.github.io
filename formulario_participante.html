@@ -83,10 +83,10 @@
       <section id="sec-datos">
         <h2>1. Datos del participante</h2>
         <label class="field">Nombre completo
-          <input type="text" id="p_nombre" required>
+          <input type="text" id="p_nombre">
         </label>
         <label class="field">Correo institucional
-          <input type="email" id="p_correo" required placeholder="nombre@utm.edu.ec">
+          <input type="email" id="p_correo" placeholder="nombre@utm.edu.ec">
         </label>
         <label class="field">Edad
           <input type="number" id="p_edad" min="1" max="120">
@@ -201,7 +201,7 @@
     preguntas.forEach((preg, i) => {
       html += `<tr><td>${preg}</td>`;
       for(let v=1; v<=5; v++){
-        html += `<td><input type="radio" name="${prefix}_q${i}" value="${v}" required></td>`;
+        html += `<td><input type="radio" name="${prefix}_q${i}" value="${v}"></td>`;
       }
       html += "</tr>";
     });
@@ -377,10 +377,6 @@
     }
   }
 </script>
-
-</body>
-</html>
-</html>
 
 </body>
 </html>
